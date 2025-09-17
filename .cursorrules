@@ -1,0 +1,285 @@
+# Ghost Dashboard - Cursor Rules
+
+## Scope de estas reglas
+Solo guían estructura, estándares, y tareas asistidas por Cursor. No decide UX ni lógica de negocio. Aplica a:
+- Frontend (Yew/WASM)
+- Backend (Axum gateway/proxy) 
+- CI local básica
+
+## Proyecto
+Dashboard financiero en Rust + Yew que consume la inBestia API vía backend proxy seguro.
+
+## Estructura del Proyecto
+
+### Workspace Rust
+```
+ghost/
+├─ .env.example            # Plantilla de variables (subir a git)
+├─ .env                    # Variables reales (NO subir a git)
+├─ .gitignore              # Excluir .env, target/, etc.
+├─ Cargo.toml              # Workspace con resolver "2"
+├─ Trunk.toml              # Proxy config para desarrollo
+├─ README.md               # Documentación principal
+├─ PROGRESS.md             # Seguimiento del proyecto
+├─ docs/                   # Documentación detallada
+├─ backend/                # Crate Axum (proxy/API)
+└─ frontend/               # Crate Yew (WASM/SPA)
+```
+
+### .gitignore
+```
+/target
+/.env
+/frontend/dist
+**/*.rs.bk
+.DS_Store
+```
+
+### .env.example
+```
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ghost_dev
+INBESTIA_API_URL=http://localhost:8080
+INBESTIA_API_KEY=CHANGEME
+BIND_ADDR=127.0.0.1:8085
+CORS_ALLOWED_ORIGINS=http://127.0.0.1:3001
+```
+
+### Trunk.toml
+```toml
+[[proxy]]
+backend = "http://127.0.0.1:8085"
+rewrite = "/api/"
+```
+
+### Backend (Axum)
+```
+backend/
+├─ Cargo.toml              # Dependencias: axum, tokio, reqwest, dotenvy, etc.
+└─ src/
+   ├─ main.rs              # Gateway principal con proxy
+   ├─ handlers/            # Manejadores de rutas (futuro)
+   ├─ middleware/          # CORS, auth, logging (futuro)
+   └─ config/              # Configuración (futuro)
+```
+
+### Frontend (Yew)
+```
+frontend/
+├─ Cargo.toml              # Dependencias: yew, yew-router, gloo-*, serde
+├─ index.html              # HTML base con Bulma CSS + CSP
+└─ src/
+   ├─ main.rs              # Entry point Yew
+   ├─ app.rs               # Componente raíz
+   ├─ components/          # UI reutilizable
+   │  ├─ mod.rs
+   │  ├─ info_card.rs
+   │  └─ common/           # Componentes comunes
+   ├─ services/            # HTTP, API calls
+   │  ├─ mod.rs
+   │  └─ api.rs
+   ├─ domain/              # DTOs, tipos, mappers
+   │  ├─ mod.rs
+   │  ├─ types.rs
+   │  └─ mappers.rs
+   ├─ stores/              # Estado global (yewdux/context)
+   │  ├─ mod.rs
+   │  └─ portfolio.rs
+   ├─ routes/              # Páginas/vistas
+   │  ├─ mod.rs
+   │  ├─ dashboard.rs
+   │  └─ asset.rs
+   └─ utils/               # Helpers, errores
+      ├─ mod.rs
+      ├─ format.rs
+      └─ errors.rs
+```
+
+### Index HTML (CSP + Bulma)
+```html
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Ghost Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; connect-src 'self' http://127.0.0.1:8081; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; script-src 'self'; img-src 'self' data:">
+</head>
+<body>
+  <div id="root"></div>
+  <link data-trunk rel="rust" />
+</body>
+</html>
+```
+
+## Reglas de Desarrollo
+
+### Rust
+- Usar `edition = "2021"`
+- Preferir `anyhow` para errores en backend
+- Usar `thiserror` para errores en frontend
+- Seguir convenciones de naming (snake_case)
+- Documentar funciones públicas con `///`
+
+### Backend (Axum)
+- Usar `axum` con features: `["macros", "json"]`
+- Implementar proxy para todas las rutas `/api/*`
+- Inyectar `Authorization: Bearer $API_KEY` en rutas autenticadas
+- Usar `CorsLayer::permissive()` para desarrollo
+- Usar `TraceLayer` para logging
+- Manejar errores con `anyhow::Result`
+
+### Frontend (Yew)
+- Usar `yew` con feature `["csr"]`
+- Preferir `function_component` sobre `struct_component`
+- Usar `use_state` y `use_effect_with` para estado
+- Llamadas HTTP con `gloo_net::http::Request`
+- Usar `serde` para serialización/deserialización
+- Manejar errores con `Result<T, String>`
+
+### Estilos
+- Usar Bulma CSS desde CDN
+- Preferir clases de Bulma sobre CSS custom
+- Usar componentes de Bulma: `card`, `notification`, `progress`
+- Responsive design con columnas de Bulma
+
+### Seguridad
+- **NUNCA exponer credenciales en el frontend (WASM)**
+- **Prohibido INBESTIA_API_KEY en frontend y commits**
+- Usar proxy backend para todas las llamadas autenticadas
+- Variables sensibles solo en `.env` (backend)
+- Frontend solo recibe URLs base, no claves
+- **CORS: permissive solo en dev. En prod: CORS_ALLOWED_ORIGINS**
+- **Passthrough público solo: /, /health, /api/v1/info**
+
+### Configuración
+- Backend: `BIND_ADDR=127.0.0.1:8085`
+- Frontend: `trunk serve` en puerto 3001
+- Proxy: Trunk reescribe `/api/` → `http://127.0.0.1:8085`
+- Variables: `DATABASE_URL`, `INBESTIA_API_URL`, `INBESTIA_API_KEY`, `CORS_ALLOWED_ORIGINS`
+- **Prefijo gateway: /api/v1/* para versionado**
+
+### Comandos de Desarrollo
+```bash
+# Terminal 1 - Backend
+cd ghost/backend
+cargo run
+
+# Terminal 2 - Frontend  
+cd ghost/frontend
+trunk serve --open
+```
+
+### Estándares de Código
+- Usar `rustfmt` para formateo
+- Usar `clippy` para linting
+- Documentar funciones públicas
+- Comentarios en español para lógica compleja
+- Nombres descriptivos para variables y funciones
+
+### Testing
+- **Backend: tests de integración en backend/tests/ para cada ruta del gateway con reqwest**
+- **Frontend: tests de mappers/format helpers; no UI profunda**
+- Tests unitarios en `#[cfg(test)]` modules
+- Mock de APIs para tests del frontend
+- **Server en puerto random para tests de integración**
+
+### Git
+- Commits descriptivos en español
+- Branch por feature: `feature/nombre-funcionalidad`
+- PRs con descripción clara
+- **Nunca commitear `.env` con credenciales reales**
+- **PR checklist: seguridad, logs, errores, tests**
+
+### CI y Calidad
+```bash
+# Comandos obligatorios
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+```
+
+### Makefile (opcional)
+```makefile
+format:; cargo fmt --all
+lint:; cargo clippy --workspace --all-targets -- -D warnings
+test:; cargo test --workspace
+run-backend:; cd backend && cargo run
+run-frontend:; cd frontend && trunk serve --open
+```
+
+## Convenciones Específicas
+
+### Naming
+- Archivos: `snake_case.rs`
+- Funciones: `snake_case()`
+- Structs: `PascalCase`
+- Enums: `PascalCase`
+- Constantes: `SCREAMING_SNAKE_CASE`
+
+### Imports
+- Agrupar por tipo: std, extern, local
+- Orden alfabético dentro de cada grupo
+- Usar `use` específicos, evitar `*`
+
+### Error Handling
+- Backend: `anyhow::Result<T>`
+- Frontend: `Result<T, String>`
+- **Logging con `tracing` y `TraceLayer` en backend**
+- **No loggear claves ni secretos**
+- **Estándar de respuesta de error backend:**
+```json
+{
+  "error": {
+    "code": "UPSTREAM_TIMEOUT",
+    "message": "Servicio no disponible",
+    "trace_id": "abc123"
+  }
+}
+```
+- Notificaciones de error en UI
+
+### Estado
+- Local: `use_state` para componente
+- Global: stores en `stores/` directory
+- Persistencia: `gloo_storage` para localStorage
+
+## Prompts de Tareas (para Cursor)
+
+### 1) Nuevo componente Yew
+Crea `frontend/src/components/{name}.rs` como `#[function_component]`.
+- Genera Props con `#[derive(Properties, PartialEq, Clone)]`
+- Solo render. Sin side effects
+- Docstring con uso
+- Actualiza `components/mod.rs`
+
+### 2) Nuevo handler Axum proxied
+En backend, crea handler para {METHOD} {PATH}.
+- Forward a `{INBESTIA_API_URL}{PATH}`
+- Timeout 5s, 2 retries con backoff 150/300 ms
+- Mapea errores al contrato JSON estándar
+- Añade a router y test de integración
+
+### 3) Test integración backend
+Levanta app en puerto random con state dummy.
+- Prueba GET `/api/v1/info` passthrough
+- Asserta status, content-type y shape JSON
+- Incluye `trace_id` en errores simulados
+
+### 4) Llamada HTTP en frontend
+En `frontend/src/services/api.rs` agrega función `get_{name}()`:
+- `gloo_net::http::Request` a `/api/v1/{path}`
+- Retorna `Result<T, String>`
+- Deserializa con `serde`
+- Añade ejemplo de consumo en un componente
+
+## Notas Importantes
+- El frontend es WASM, no puede acceder directamente a APIs externas
+- Todas las llamadas pasan por el proxy backend
+- Las credenciales nunca llegan al navegador
+- Usar Bulma para UI consistente y responsive
+- Seguir principios de Rust: ownership, borrowing, lifetimes
+- **Frontend habla solo con /api/*. Nada directo a proveedores**
+- **Cache corto y métricas pueden agregarse luego en middleware/**
+- **Mantener README.md y PROGRESS.md al día**

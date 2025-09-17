@@ -1,0 +1,476 @@
+/* Estilos base para el tema claro (por defecto) */
+html:not(.is-dark),
+body:not(.is-dark),
+#root,
+.app:not(.is-dark) {
+  background-color: #ffffff !important;
+  color: #363636 !important;
+  min-height: 100vh;
+}
+
+/* Tema claro aplicado globalmente */
+html:not(.is-dark) {
+  background-color: #ffffff !important;
+  color-scheme: light;
+}
+
+body:not(.is-dark) {
+  background-color: #ffffff !important;
+  color: #363636 !important;
+}
+
+/* Estilos base para el tema oscuro */
+html.is-dark,
+body.is-dark,
+#root,
+.app.is-dark {
+  background-color: #0a0a0a !important;
+  color: #f5f5f5 !important;
+  min-height: 100vh;
+}
+
+/* Tema oscuro aplicado globalmente */
+html.is-dark {
+  background-color: #0a0a0a !important;
+  color-scheme: dark;
+}
+
+body.is-dark {
+  background-color: #0a0a0a !important;
+  color: #f5f5f5 !important;
+}
+
+/* Estilos específicos para el menú en tema oscuro */
+html.is-dark .menu,
+.app.is-dark .menu {
+  background-color: #1a1a1a !important;
+  border-right: 1px solid #363636;
+  padding: 0.75rem 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+html.is-dark .menu-label,
+.app.is-dark .menu-label {
+  color: #f5f5f5 !important;
+  margin-bottom: 0.75rem;
+  padding: 0 0.5rem;
+}
+
+html.is-dark .menu-label .is-flex,
+.app.is-dark .menu-label .is-flex {
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+html.is-dark .menu-list a,
+html.is-dark .menu-list a span,
+.app.is-dark .menu-list a,
+.app.is-dark .menu-list a span {
+  color: #dbdbdb !important;
+  border-radius: 4px;
+  margin: 2px 0;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+html.is-dark .menu-list a:hover,
+html.is-dark .menu-list a:hover span,
+.app.is-dark .menu-list a:hover,
+.app.is-dark .menu-list a:hover span {
+  background-color: #363636 !important;
+  color: #ffffff !important;
+}
+
+html.is-dark .menu-list a.is-active,
+html.is-dark .menu-list a.is-active span,
+.app.is-dark .menu-list a.is-active,
+.app.is-dark .menu-list a.is-active span {
+  background-color: #3273dc !important;
+  color: #ffffff !important;
+}
+
+/* Estilos para tarjetas en tema oscuro */
+html.is-dark .card,
+.app.is-dark .card {
+  background-color: #2a2a2a !important;
+  color: #f5f5f5 !important;
+  border: 1px solid #363636;
+}
+
+/* Estilos para texto en tema oscuro */
+html.is-dark .title,
+html.is-dark .subtitle,
+html.is-dark .content,
+html.is-dark h1, html.is-dark h2, html.is-dark h3,
+html.is-dark h4, html.is-dark h5, html.is-dark h6,
+html.is-dark p,
+.app.is-dark .title,
+.app.is-dark .subtitle,
+.app.is-dark .content,
+.app.is-dark h1, .app.is-dark h2, .app.is-dark h3,
+.app.is-dark h4, .app.is-dark h5, .app.is-dark h6,
+.app.is-dark p {
+  color: #f5f5f5 !important;
+}
+
+html.is-dark .subtitle,
+html.is-dark .content p,
+.app.is-dark .subtitle,
+.app.is-dark .content p {
+  color: #dbdbdb !important;
+}
+
+/* Estilos para contenedores en tema oscuro */
+html.is-dark .container,
+html.is-dark .column,
+.app.is-dark .container,
+.app.is-dark .column {
+  background-color: transparent !important;
+  color: #f5f5f5 !important;
+}
+
+/* Estilos para el área principal de contenido */
+html.is-dark .columns,
+.app.is-dark .columns {
+  background-color: #0a0a0a !important;
+  color: #f5f5f5 !important;
+}
+
+html.is-dark .column:not(.is-2),
+.app.is-dark .column:not(.is-2) {
+  background-color: #0a0a0a !important;
+  color: #f5f5f5 !important;
+}
+
+/* Asegurar que el main content tenga el fondo correcto */
+html.is-dark .column .container,
+html.is-dark .column > div,
+.app.is-dark .column .container,
+.app.is-dark .column > div {
+  background-color: transparent !important;
+}
+
+/* Estilos para el tema claro */
+html:not(.is-dark) .menu,
+.app:not(.is-dark) .menu {
+  background-color: #f8f9fa !important;
+  border-right: 1px solid #e5e5e5;
+  padding: 0.75rem 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+html:not(.is-dark) .menu-label,
+.app:not(.is-dark) .menu-label {
+  color: #363636 !important;
+  margin-bottom: 0.75rem;
+  padding: 0 0.5rem;
+}
+
+html:not(.is-dark) .menu-label .is-flex,
+.app:not(.is-dark) .menu-label .is-flex {
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+html:not(.is-dark) .menu-list a,
+html:not(.is-dark) .menu-list a span,
+.app:not(.is-dark) .menu-list a,
+.app:not(.is-dark) .menu-list a span {
+  color: #6b7280 !important;
+  border-radius: 4px;
+  margin: 2px 0;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+/* Estilos más específicos para overridear Bulma */
+body:not(.is-dark) .menu-list a,
+body:not(.is-dark) .menu-list a span,
+body.app:not(.is-dark) .menu-list a,
+body.app:not(.is-dark) .menu-list a span,
+.app:not(.is-dark) .menu-list li a,
+.app:not(.is-dark) .menu-list li a span {
+  color: #6b7280 !important;
+}
+
+body.is-dark .menu-list a,
+body.is-dark .menu-list a span,
+body.app.is-dark .menu-list a,
+body.app.is-dark .menu-list a span,
+.app.is-dark .menu-list li a,
+.app.is-dark .menu-list li a span {
+  color: #dbdbdb !important;
+}
+
+/* Force default state colors - muy específico */
+body.app .column .menu .menu-list a:not(.is-active):not(:hover),
+body.app .column .menu .menu-list a:not(.is-active):not(:hover) span {
+  color: #6b7280 !important;
+}
+
+body.app.is-dark .column .menu .menu-list a:not(.is-active):not(:hover),
+body.app.is-dark .column .menu .menu-list a:not(.is-active):not(:hover) span {
+  color: #dbdbdb !important;
+}
+
+/* Reset completo de Bulma para menu-list */
+.menu-list a {
+  color: inherit !important;
+}
+
+/* Aplicar colores por defecto según tema */
+body:not(.is-dark) .menu-list,
+body.app:not(.is-dark) .menu-list {
+  color: #6b7280;
+}
+
+body.is-dark .menu-list,
+body.app.is-dark .menu-list {
+  color: #dbdbdb;
+}
+
+html:not(.is-dark) .menu-list a:hover,
+html:not(.is-dark) .menu-list a:hover span,
+.app:not(.is-dark) .menu-list a:hover,
+.app:not(.is-dark) .menu-list a:hover span {
+  background-color: #e5e5e5 !important;
+  color: #000000 !important;
+}
+
+html:not(.is-dark) .menu-list a.is-active,
+html:not(.is-dark) .menu-list a.is-active span,
+.app:not(.is-dark) .menu-list a.is-active,
+.app:not(.is-dark) .menu-list a.is-active span {
+  background-color: #3273dc !important;
+  color: #ffffff !important;
+}
+
+/* Estilos para tarjetas en tema claro */
+html:not(.is-dark) .card,
+.app:not(.is-dark) .card {
+  background-color: #ffffff !important;
+  color: #363636 !important;
+  border: 1px solid #dbdbdb;
+  box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1);
+}
+
+/* Estilos para texto en tema claro */
+html:not(.is-dark) .title,
+html:not(.is-dark) .subtitle,
+html:not(.is-dark) .content,
+html:not(.is-dark) h1, html:not(.is-dark) h2, html:not(.is-dark) h3,
+html:not(.is-dark) h4, html:not(.is-dark) h5, html:not(.is-dark) h6,
+html:not(.is-dark) p,
+.app:not(.is-dark) .title,
+.app:not(.is-dark) .subtitle,
+.app:not(.is-dark) .content,
+.app:not(.is-dark) h1, .app:not(.is-dark) h2, .app:not(.is-dark) h3,
+.app:not(.is-dark) h4, .app:not(.is-dark) h5, .app:not(.is-dark) h6,
+.app:not(.is-dark) p {
+  color: #363636 !important;
+}
+
+html:not(.is-dark) .subtitle,
+html:not(.is-dark) .content p,
+.app:not(.is-dark) .subtitle,
+.app:not(.is-dark) .content p {
+  color: #4a4a4a !important;
+}
+
+/* Estilos para contenedores en tema claro */
+html:not(.is-dark) .container,
+html:not(.is-dark) .column,
+.app:not(.is-dark) .container,
+.app:not(.is-dark) .column {
+  background-color: transparent !important;
+  color: #363636 !important;
+}
+
+/* Estilos para el área principal de contenido en tema claro */
+html:not(.is-dark) .columns,
+.app:not(.is-dark) .columns {
+  background-color: #ffffff !important;
+  color: #363636 !important;
+}
+
+html:not(.is-dark) .column:not(.is-2),
+.app:not(.is-dark) .column:not(.is-2) {
+  background-color: #ffffff !important;
+  color: #363636 !important;
+}
+
+/* Asegurar que el main content tenga el fondo correcto en tema claro */
+html:not(.is-dark) .column .container,
+html:not(.is-dark) .column > div,
+.app:not(.is-dark) .column .container,
+.app:not(.is-dark) .column > div {
+  background-color: transparent !important;
+}
+
+/* Estilos generales */
+.menu-list .icon {
+  margin-right: 8px;
+  width: 16px;
+  text-align: center;
+}
+
+/* Estilos para botones del tema oscuro */
+html.is-dark .button.is-ghost,
+.app.is-dark .button.is-ghost {
+  background: none !important;
+  border: none !important;
+  padding: 4px 6px !important;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  color: #f5f5f5 !important;
+  font-size: 14px;
+  width: auto;
+  height: auto;
+  min-height: unset;
+}
+
+html.is-dark .button.is-ghost:hover,
+.app.is-dark .button.is-ghost:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+/* Estilos para botones del tema claro */
+html:not(.is-dark) .button.is-ghost,
+.app:not(.is-dark) .button.is-ghost {
+  background: none !important;
+  border: none !important;
+  padding: 4px 6px !important;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  color: #6b7280 !important;
+  font-size: 14px;
+  width: auto;
+  height: auto;
+  min-height: unset;
+}
+
+html:not(.is-dark) .button.is-ghost:hover,
+.app:not(.is-dark) .button.is-ghost:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  color: #000000 !important;
+}
+
+/* Estilos para el spinner de carga */
+.spinner {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #3273dc;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Estilos para las métricas del sistema */
+.box {
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.progress {
+  height: 8px;
+  border-radius: 4px;
+}
+
+.progress.is-success {
+  background-color: #48c774;
+}
+
+.progress.is-warning {
+  background-color: #ffdd57;
+}
+
+.progress.is-danger {
+  background-color: #ff3860;
+}
+
+/* Estilos para las etiquetas de métricas */
+.tag.is-light {
+  background-color: #f5f5f5;
+  color: #363636;
+}
+
+.tag.is-info {
+  background-color: #3e8ed0;
+  color: white;
+}
+
+.tag.is-primary {
+  background-color: #00d1b2;
+  color: white;
+}
+
+/* Estilos para el tema oscuro en métricas */
+html.is-dark .box,
+.app.is-dark .box {
+  background-color: #363636 !important;
+  border: 1px solid #4a4a4a;
+}
+
+html.is-dark .tag.is-light,
+.app.is-dark .tag.is-light {
+  background-color: #4a4a4a !important;
+  color: #f5f5f5 !important;
+}
+
+html.is-dark .help,
+.app.is-dark .help {
+  color: #b5b5b5 !important;
+}
+
+/* Estilos para el tema oscuro del spinner */
+html.is-dark .spinner,
+.app.is-dark .spinner {
+  border: 2px solid #363636;
+  border-top: 2px solid #3273dc;
+}
+
+/* Estilos para las etiquetas de estado */
+.tags .tag {
+  font-weight: 500;
+}
+
+.tags .tag.is-success {
+  background-color: #48c774 !important;
+  color: white !important;
+}
+
+.tags .tag.is-danger {
+  background-color: #f14668 !important;
+  color: white !important;
+}
+
+/* Estilos para iconos de estado */
+.icon.has-text-success {
+  color: #48c774 !important;
+}
+
+.icon.has-text-danger {
+  color: #f14668 !important;
+}

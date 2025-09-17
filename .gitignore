@@ -1,0 +1,5 @@
+/target
+/.env
+/frontend/dist
+**/*.rs.bk
+.DS_Store

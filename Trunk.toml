@@ -1,0 +1,7 @@
+[[proxy]]
+backend = "http://127.0.0.1:8085"
+rewrite = "/api/"
+insecure = true
+
+[serve]
+port = 3001
