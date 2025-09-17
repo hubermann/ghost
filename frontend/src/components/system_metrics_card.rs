@@ -1,5 +1,4 @@
 use yew::prelude::*;
-use std::rc::Rc;
 use crate::services::api::fetch_system_metrics;
 use crate::domain::types::SystemMetricsResponse;
 
@@ -10,48 +9,46 @@ pub fn SystemMetricsCard() -> Html {
     let error = use_state(|| None::<String>);
 
     // Cargar métricas automáticamente al montar el componente
-    let metrics_state_clone = metrics_state.clone();
-    let loading_clone = loading.clone();
-    let error_clone = error.clone();
-    
-    use_effect(move || {
-        let metrics_state = metrics_state_clone.clone();
-        let loading = loading_clone.clone();
-        let error = error_clone.clone();
-        
-        loading.set(true);
-        error.set(None);
-        
-        wasm_bindgen_futures::spawn_local(async move {
-            match fetch_system_metrics().await {
-                Ok(metrics) => {
-                    metrics_state.set(Some(metrics));
-                    loading.set(false);
+    {
+        let metrics_state = metrics_state.clone();
+        let loading = loading.clone();
+        let error = error.clone();
+
+        use_effect_with((), move |_| {
+            loading.set(true);
+            error.set(None);
+
+            wasm_bindgen_futures::spawn_local(async move {
+                match fetch_system_metrics().await {
+                    Ok(metrics) => {
+                        metrics_state.set(Some(metrics));
+                        loading.set(false);
+                    }
+                    Err(e) => {
+                        error.set(Some(e));
+                        loading.set(false);
+                    }
                 }
-                Err(e) => {
-                    error.set(Some(e));
-                    loading.set(false);
-                }
-            }
+            });
+
+            || {}
         });
-        
-        || {}
-    });
+    }
 
     // Función para actualizar métricas manualmente
     let refresh_metrics = {
-        let metrics_state = Rc::new(metrics_state.clone());
-        let loading = Rc::new(loading.clone());
-        let error = Rc::new(error.clone());
-        
+        let metrics_state = metrics_state.clone();
+        let loading = loading.clone();
+        let error = error.clone();
+
         Callback::from(move |_| {
             let metrics_state = metrics_state.clone();
             let loading = loading.clone();
             let error = error.clone();
-            
+
             loading.set(true);
             error.set(None);
-            
+
             wasm_bindgen_futures::spawn_local(async move {
                 match fetch_system_metrics().await {
                     Ok(metrics) => {

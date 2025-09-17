@@ -54,7 +54,7 @@ pub fn Layout() -> Html {
     );
 
     // También aplicar el tema inmediatamente al renderizar (inicial)
-    use_effect(|| {
+    use_effect_with((), |_| {
         if let Some(window) = window() {
             if let Some(document) = window.document() {
                 // Forzar tema claro inicial si no hay tema guardado
