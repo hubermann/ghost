@@ -6,6 +6,7 @@ body:not(.is-dark),
   background-color: #ffffff !important;
   color: #363636 !important;
   min-height: 100vh;
+  font-size: 14px; /* Tamaño base del tema claro */
 }
 
 /* Tema claro aplicado globalmente */
@@ -27,6 +28,7 @@ body.is-dark,
   background-color: #0a0a0a !important;
   color: #f5f5f5 !important;
   min-height: 100vh;
+  font-size: 14px; /* Tamaño base del tema oscuro */
 }
 
 /* Tema oscuro aplicado globalmente */
