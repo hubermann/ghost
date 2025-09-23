@@ -62,16 +62,24 @@ pub fn ApiStatusCard() -> Html {
                             <div class="control">
                                 <div class="tags has-addons">
                                     <span class="tag">{ "Gateway" }</span>
-                                    <span class={format!("tag is-{}", if health.gateway == "healthy" { "success" } else { "danger" })}>
-                                        { &health.gateway }
+                                    <span class={format!("tag is-{}", if health.gateway.status == "healthy" { "success" } else { "danger" })}>
+                                        { &health.gateway.status }
                                     </span>
                                 </div>
                             </div>
                             <div class="control">
                                 <div class="tags has-addons">
                                     <span class="tag">{ "inBestia API" }</span>
-                                    <span class={format!("tag is-{}", if health.inbestia_api == "available" { "success" } else { "danger" })}>
-                                        { &health.inbestia_api }
+                                    <span class={format!("tag is-{}", if health.external_api.status == "available" { "success" } else { "danger" })}>
+                                        { &health.external_api.status }
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="control">
+                                <div class="tags has-addons">
+                                    <span class="tag">{ "Response Time" }</span>
+                                    <span class="tag is-info">
+                                        { format!("{}ms", health.external_api.response_time_ms) }
                                     </span>
                                 </div>
                             </div>
@@ -93,19 +101,13 @@ pub fn ApiStatusCard() -> Html {
                                     }</strong>
                                     <br />
                                     <small class="has-text-grey">
-                                        { "Verificación: " }{ &health.timestamp }
+                                        { "Verificación: " }{ &health.timestamp }<br />
+                                        { format!("Gateway v{} (uptime: {}s)", health.gateway.version, health.gateway.uptime_secs) }
                                     </small>
                                 </div>
                             </div>
                         </div>
 
-                        // Error si existe
-                        if let Some(error_msg) = &health.error {
-                            <div class="notification is-warning">
-                                <strong>{ "Detalles del error:" }</strong>
-                                <p>{ error_msg }</p>
-                            </div>
-                        }
 
                         // Trace ID para debugging
                         if let Some(trace_id) = &health.trace_id {

@@ -1,6 +1,6 @@
 use yew::prelude::*;
-use crate::domain::analysis_types::TimeframesState;
-use crate::services::analysis_api::fetch_timeframes_config;
+use crate::api::timeframes::{TimeframeService, TimeframeMetadata};
+use crate::config::AppConfig;
 use web_sys::wasm_bindgen::JsCast;
 use js_sys;
 
@@ -10,9 +10,16 @@ pub struct TimeframeSelectorProps {
     pub on_change: Callback<String>,
 }
 
+#[derive(Clone, PartialEq)]
+pub enum TimeframeState {
+    Loading,
+    Loaded(Vec<TimeframeMetadata>),
+    Error(String),
+}
+
 #[function_component]
 pub fn TimeframeSelector(props: &TimeframeSelectorProps) -> Html {
-    let timeframes_state = use_state(|| TimeframesState::Loading);
+    let timeframes_state = use_state(|| TimeframeState::Loading);
     let selected_timeframe = use_state(|| props.value.clone());
 
     // Cargar timeframes al montar el componente
@@ -21,12 +28,24 @@ pub fn TimeframeSelector(props: &TimeframeSelectorProps) -> Html {
         use_effect(move || {
             let timeframes_state = timeframes_state.clone();
             wasm_bindgen_futures::spawn_local(async move {
-                match fetch_timeframes_config().await {
-                    Ok(response) => {
-                        timeframes_state.set(TimeframesState::Loaded(response.timeframes));
+                let mut service = TimeframeService::new(
+                    AppConfig::TIMEFRAMES_API_URL.to_string(),
+                    AppConfig::API_KEY.to_string()
+                );
+
+                match service.fetch_config().await {
+                    Ok(_) => {
+                        match service.get_timeframes() {
+                            Ok(timeframes) => {
+                                timeframes_state.set(TimeframeState::Loaded(timeframes.clone()));
+                            }
+                            Err(error) => {
+                                timeframes_state.set(TimeframeState::Error(error));
+                            }
+                        }
                     }
                     Err(error) => {
-                        timeframes_state.set(TimeframesState::Error(error));
+                        timeframes_state.set(TimeframeState::Error(error));
                     }
                 }
             });
@@ -61,7 +80,7 @@ pub fn TimeframeSelector(props: &TimeframeSelectorProps) -> Html {
     };
 
     match (*timeframes_state).clone() {
-        TimeframesState::Loading => {
+        TimeframeState::Loading => {
             html! {
                 <div class="select is-loading">
                     <select disabled={true}>
@@ -70,16 +89,19 @@ pub fn TimeframeSelector(props: &TimeframeSelectorProps) -> Html {
                 </div>
             }
         }
-        TimeframesState::Error(error) => {
+        TimeframeState::Error(error) => {
             html! {
-                <div class="select">
-                    <select disabled={true}>
-                        <option>{ format!("Error: {}", error) }</option>
-                    </select>
+                <div class="field">
+                    <div class="select is-danger">
+                        <select disabled={true}>
+                            <option>{ "Sin conexión a la API" }</option>
+                        </select>
+                    </div>
+                    <p class="help is-danger">{ error }</p>
                 </div>
             }
         }
-        TimeframesState::Loaded(timeframes) => {
+        TimeframeState::Loaded(timeframes) => {
             html! {
                 <div class="select">
                     <select 

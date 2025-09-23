@@ -1,0 +1,13 @@
+[build]
+# Disable integrity checks for development
+dist = "dist"
+
+[serve]
+# Development server configuration
+port = 3002
+address = "127.0.0.1"
+
+# Disable integrity for development to avoid hash mismatches
+[build.rust]
+# Don't generate integrity hashes in development
+no_default_features = false

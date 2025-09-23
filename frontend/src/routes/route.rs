@@ -6,6 +6,8 @@ pub enum Route {
     Home,
     #[at("/api-status")]
     ApiStatus,
+    #[at("/api-status-direct")]
+    ApiStatusDirect,
     #[at("/asset-analysis")]
     AssetAnalysis,
     #[not_found]

@@ -1,5 +1,6 @@
 use crate::domain::analysis_types::{AnalysisRequest, AnalysisResponse, TimeframesConfigResponse, SymbolErrorResponse};
 use gloo_net::http::Request;
+use crate::config::AppConfig;
 
 pub async fn analyze_asset(request: AnalysisRequest) -> Result<AnalysisResponse, String> {
     let request_body = serde_json::to_value(&request)
@@ -8,7 +9,7 @@ pub async fn analyze_asset(request: AnalysisRequest) -> Result<AnalysisResponse,
     // Debug logging
     web_sys::console::log_1(&format!("Sending request: {:?}", request_body).into());
 
-    let response = Request::post("http://127.0.0.1:8085/api/v1/analyze")
+    let response = Request::post(&AppConfig::analyze_url())
         .header("Content-Type", "application/json")
         .json(&request_body)
         .map_err(|e| format!("Error creando request: {}", e))?
@@ -38,7 +39,7 @@ pub async fn analyze_asset(request: AnalysisRequest) -> Result<AnalysisResponse,
 }
 
 pub async fn fetch_timeframes_config() -> Result<TimeframesConfigResponse, String> {
-    let response = Request::get("http://127.0.0.1:8085/api/v1/timeframes/config")
+    let response = Request::get(&AppConfig::timeframes_config_url())
         .send()
         .await
         .map_err(|e| format!("Error de conexión: {}", e))?;

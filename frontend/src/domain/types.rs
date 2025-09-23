@@ -38,16 +38,28 @@ pub struct Endpoint {
 #[derive(Debug, Clone, Deserialize, PartialEq)]
 pub struct ApiHealth {
     pub status: String,
-    pub inbestia_api: String,
-    pub gateway: String,
+    pub external_api: ExternalApiStatus,
+    pub gateway: GatewayStatus,
     pub timestamp: String,
     pub trace_id: Option<String>,
-    pub error: Option<String>,
 }
 
-/// Métricas del sistema de inBestia
 #[derive(Debug, Clone, Deserialize, PartialEq)]
-pub struct SystemMetrics {
+pub struct ExternalApiStatus {
+    pub response_time_ms: u64,
+    pub status: String,
+}
+
+#[derive(Debug, Clone, Deserialize, PartialEq)]
+pub struct GatewayStatus {
+    pub status: String,
+    pub uptime_secs: u64,
+    pub version: String,
+}
+
+/// Métricas de la API externa
+#[derive(Debug, Clone, Deserialize, PartialEq)]
+pub struct ExternalApiMetrics {
     pub cpu_usage: f64,
     pub memory_usage: f64,
     pub database_connections: u32,
@@ -55,12 +67,32 @@ pub struct SystemMetrics {
     pub active_requests: u32,
 }
 
+/// Métricas del gateway
+#[derive(Debug, Clone, Deserialize, PartialEq)]
+pub struct GatewayMetrics {
+    pub active_connections: u32,
+    pub cpu: CpuMetrics,
+    pub memory: MemoryMetrics,
+    pub uptime_secs: u64,
+}
+
+#[derive(Debug, Clone, Deserialize, PartialEq)]
+pub struct CpuMetrics {
+    pub usage_percent: f64,
+}
+
+#[derive(Debug, Clone, Deserialize, PartialEq)]
+pub struct MemoryMetrics {
+    pub used_mb: u64,
+    pub available_mb: u64,
+}
+
 /// Respuesta de métricas del sistema
 #[derive(Debug, Clone, Deserialize, PartialEq)]
 pub struct SystemMetricsResponse {
     pub status: String,
-    pub data: SystemMetrics,
+    pub external_api_metrics: ExternalApiMetrics,
+    pub gateway_metrics: GatewayMetrics,
     pub timestamp: String,
     pub trace_id: Option<String>,
-    pub error: Option<String>,
 }

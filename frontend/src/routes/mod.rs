@@ -1,7 +1,9 @@
 pub mod dashboard;
 pub mod asset;
 pub mod route;
+pub mod simple_api_status;
 
 pub use dashboard::Home;
-pub use asset::{ApiStatus, AssetAnalysis};
+pub use asset::{ApiStatus, AssetAnalysisWorking, AssetAnalysis};
+pub use simple_api_status::SimpleApiStatus;
 pub use route::Route;
