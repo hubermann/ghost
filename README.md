@@ -73,7 +73,7 @@ Copia `.env.example` a `.env` y configura tus valores:
 ```bash
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ghost_dev
 INBESTIA_API_URL=http://localhost:8080
-INBESTIA_API_KEY=CHANGEME
+INBESTIA_API_KEY=inbestia2025key
 BIND_ADDR=127.0.0.1:8085
 CORS_ALLOWED_ORIGINS=http://127.0.0.1:3001
 ```
@@ -140,12 +140,28 @@ cd frontend && cargo test
 
 ## 📋 CI y Calidad
 
+### Verificación Pre-commit
 ```bash
-# Comandos obligatorios
+# Ejecutar antes de cada commit
+./scripts/pre-commit.sh
+```
+
+### Comandos Manuales
+```bash
+# Formato de código
 cargo fmt --all -- --check
+
+# Linting
 cargo clippy --workspace --all-targets -- -D warnings
+
+# Tests
 cargo test --workspace
 ```
+
+### Reglas de Desarrollo
+- **DEVELOPMENT_GUIDELINES.md**: Reglas completas de desarrollo
+- **.cursorrules**: Reglas específicas para Cursor
+- **CI/CD**: Verificación automática en GitHub Actions
 
 ## 🛠️ Desarrollo
 
@@ -165,8 +181,10 @@ cargo test --workspace
 
 - **README.md**: Documentación principal
 - **PROGRESS.md**: Seguimiento del proyecto
-- **.cursorrules**: Reglas y estándares para Cursor
-- **docs/**: Documentación detallada (futuro)
+- **DEVELOPMENT_GUIDELINES.md**: Reglas y estándares de desarrollo
+- **.cursorrules**: Reglas específicas para Cursor
+- **scripts/pre-commit.sh**: Verificación de calidad pre-commit
+- **.github/workflows/**: CI/CD automatizado
 
 ## 🔄 Flujo de Datos
 

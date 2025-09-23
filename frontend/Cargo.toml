@@ -15,6 +15,7 @@ thiserror = "1"
 chrono = { version = "0.4", features = ["serde"] }
 wasm-bindgen-futures = "0.4"
 web-sys = "0.3"
+js-sys = "0.3"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"

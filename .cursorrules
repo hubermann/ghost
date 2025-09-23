@@ -283,3 +283,54 @@ En `frontend/src/services/api.rs` agrega función `get_{name}()`:
 - **Frontend habla solo con /api/*. Nada directo a proveedores**
 - **Cache corto y métricas pueden agregarse luego en middleware/**
 - **Mantener README.md y PROGRESS.md al día**
+
+## 🚫 Reglas Críticas de Desarrollo
+
+### Backend (Axum)
+- **NUNCA matar procesos en puerto 8080** - es la API de inBestia externa
+- **SIEMPRE validar variables de entorno** al inicio de la aplicación
+- **SIEMPRE usar trace IDs** en todos los logs
+- **SIEMPRE implementar headers de seguridad** automáticamente
+- **NUNCA usar CorsLayer::permissive()** en producción
+- **SIEMPRE limitar tamaño de requests** (máximo 2MB)
+
+### Frontend (Yew)
+- **NUNCA exponer credenciales** en código WASM
+- **NUNCA hacer llamadas directas** a APIs externas (solo /api/*)
+- **NUNCA usar HtmlSelectElement** (no existe en web_sys)
+- **SIEMPRE manejar estados** Loading/Error/Success
+- **SIEMPRE usar function_component** sobre struct_component
+- **SIEMPRE mapear timeframes** usando TimeframeConfig.to_analysis_format()
+
+### Estructura Modular Obligatoria
+- **Backend**: config/, handlers/, middleware/ separados
+- **Frontend**: components/, services/, domain/, stores/ organizados
+- **Cada módulo** debe tener documentación y ejemplos
+- **Cada endpoint** debe tener health check y métricas
+
+### Observabilidad
+- **SIEMPRE loggear duración** de requests
+- **SIEMPRE incluir trace_id** en respuestas de error
+- **SIEMPRE implementar health checks** detallados
+- **SIEMPRE monitorear métricas** del sistema
+
+### Seguridad
+- **SIEMPRE validar entrada** de usuario
+- **SIEMPRE sanitizar** datos antes de procesar
+- **SIEMPRE usar HTTPS** en producción
+- **NUNCA loggear** claves o secretos
+
+## 📋 Checklist Pre-Commit
+- [ ] Variables de entorno validadas
+- [ ] Headers de seguridad implementados
+- [ ] Trace IDs en logs
+- [ ] Manejo de errores consistente
+- [ ] Tests pasando
+- [ ] Sin warnings de compilación
+- [ ] Documentación actualizada
+
+## 🔍 Debugging
+- **Backend**: Verificar /health, revisar logs con trace_id
+- **Frontend**: Verificar compilación, Network tab, estado
+- **API**: Verificar conectividad, formato de timeframes
+- **Config**: Comparar .env con .env.example

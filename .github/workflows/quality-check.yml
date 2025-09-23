@@ -1,0 +1,181 @@
+name: Quality Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-check:
+    name: Backend Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        components: rustfmt, clippy
+    
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    
+    - name: Check formatting
+      run: cd backend && cargo fmt --all -- --check
+    
+    - name: Run clippy
+      run: cd backend && cargo clippy --all-targets -- -D warnings
+    
+    - name: Run tests
+      run: cd backend && cargo test --all-targets
+    
+    - name: Check for hardcoded values
+      run: |
+        if grep -r "localhost:8080" backend/src/; then
+          echo "❌ Found hardcoded localhost:8080 - use environment variables"
+          exit 1
+        fi
+        if grep -r "127.0.0.1:8080" backend/src/; then
+          echo "❌ Found hardcoded 127.0.0.1:8080 - use environment variables"
+          exit 1
+        fi
+        echo "✅ No hardcoded values found"
+    
+    - name: Check for security headers
+      run: |
+        if ! grep -r "X-Content-Type-Options" backend/src/; then
+          echo "❌ Security headers not implemented"
+          exit 1
+        fi
+        echo "✅ Security headers found"
+
+  frontend-check:
+    name: Frontend Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        components: rustfmt, clippy
+        target: wasm32-unknown-unknown
+    
+    - name: Install wasm-pack
+      run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+    
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-wasm-${{ hashFiles('**/Cargo.lock') }}
+    
+    - name: Check formatting
+      run: cd frontend && cargo fmt --all -- --check
+    
+    - name: Run clippy
+      run: cd frontend && cargo clippy --all-targets -- -D warnings
+    
+    - name: Run tests
+      run: cd frontend && cargo test --all-targets
+    
+    - name: Check for direct API calls
+      run: |
+        if grep -r "http://localhost:8080" frontend/src/; then
+          echo "❌ Found direct API calls - use /api/* proxy"
+          exit 1
+        fi
+        if grep -r "http://127.0.0.1:8080" frontend/src/; then
+          echo "❌ Found direct API calls - use /api/* proxy"
+          exit 1
+        fi
+        echo "✅ No direct API calls found"
+    
+    - name: Check for exposed credentials
+      run: |
+        if grep -r "INBESTIA_API_KEY" frontend/src/; then
+          echo "❌ Found exposed API key in frontend"
+          exit 1
+        fi
+        echo "✅ No credentials exposed in frontend"
+    
+    - name: Check for HtmlSelectElement usage
+      run: |
+        if grep -r "HtmlSelectElement" frontend/src/; then
+          echo "❌ Found HtmlSelectElement usage - use HtmlElement with js_sys"
+          exit 1
+        fi
+        echo "✅ No HtmlSelectElement usage found"
+
+  documentation-check:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Check README exists
+      run: test -f README.md || (echo "❌ README.md missing" && exit 1)
+    
+    - name: Check PROGRESS exists
+      run: test -f PROGRESS.md || (echo "❌ PROGRESS.md missing" && exit 1)
+    
+    - name: Check .env.example exists
+      run: test -f .env.example || (echo "❌ .env.example missing" && exit 1)
+    
+    - name: Check development guidelines exist
+      run: test -f DEVELOPMENT_GUIDELINES.md || (echo "❌ DEVELOPMENT_GUIDELINES.md missing" && exit 1)
+    
+    - name: Check for TODO comments
+      run: |
+        if grep -r "TODO:" . --exclude-dir=target --exclude-dir=.git; then
+          echo "⚠️  Found TODO comments - consider addressing them"
+        else
+          echo "✅ No TODO comments found"
+        fi
+
+  security-check:
+    name: Security Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Check for secrets in code
+      run: |
+        if grep -r "password\|secret\|key\|token" . --exclude-dir=target --exclude-dir=.git --exclude="*.md" --exclude="*.yml"; then
+          echo "⚠️  Found potential secrets in code - review manually"
+        else
+          echo "✅ No obvious secrets found"
+        fi
+    
+    - name: Check .env is gitignored
+      run: |
+        if git check-ignore .env; then
+          echo "✅ .env is properly gitignored"
+        else
+          echo "❌ .env is not gitignored"
+          exit 1
+        fi
+    
+    - name: Check for CORS permissive usage
+      run: |
+        if grep -r "CorsLayer::permissive" backend/src/; then
+          echo "❌ Found permissive CORS - use specific origins"
+          exit 1
+        fi
+        echo "✅ No permissive CORS found"
