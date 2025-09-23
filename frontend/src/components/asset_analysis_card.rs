@@ -183,7 +183,7 @@ pub fn AssetAnalysisCard() -> Html {
                     </div>
                     
                     <div class="control">
-                        <label class="label">{ " " }</label>
+                        <label class="label">{ "\u{00A0}" }</label>
                         <button 
                             class="button is-primary"
                             onclick={on_submit}
