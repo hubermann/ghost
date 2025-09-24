@@ -12,6 +12,7 @@ pub fn AssetAnalysisCard() -> Html {
     // Usar timeframes estáticos con más opciones
     let timeframes_state = use_state(|| {
         use crate::domain::analysis_types::TimeframeConfig;
+        // Usar solo los timeframes soportados por la API según /api/v1/timeframes/config
         let static_timeframes = vec![
             TimeframeConfig {
                 name: "1m".to_string(),
@@ -137,7 +138,7 @@ pub fn AssetAnalysisCard() -> Html {
         let symbol = symbol.clone();
         let timeframe = timeframe.clone();
         let analysis_state = analysis_state.clone();
-        let timeframes_state = timeframes_state.clone();
+        let _timeframes_state = timeframes_state.clone();
         
         Callback::from(move |_| {
             let symbol = symbol.clone();
@@ -150,16 +151,8 @@ pub fn AssetAnalysisCard() -> Html {
 
             analysis_state.set(AnalysisState::Loading);
             
-            // Busca el TimeframeConfig correspondiente y usa to_analysis_format():
-            let analysis_timeframe = match (*timeframes_state).clone() {
-                TimeframesState::Loaded(configs) => {
-                    configs.iter()
-                        .find(|config| config.name == *timeframe)
-                        .map(|config| config.to_analysis_format())
-                        .unwrap_or_else(|| (*timeframe).clone())
-                }
-                _ => (*timeframe).clone(),
-            };
+            // Mapear el timeframe al formato que espera la API de inBestia
+            let analysis_timeframe = map_to_api_format(&(*timeframe));
 
             let request = AnalysisRequest {
                 symbol: (*symbol).clone(),
@@ -365,5 +358,23 @@ pub fn AssetAnalysisCard() -> Html {
                 }}
             </div>
         </div>
+    }
+}
+
+/// Mapear formato de timeframe a lo que espera la API de análisis
+/// La API de análisis espera: minute1, minute5, minute15, minute30, hour1, hour4, daily, weekly, monthly
+fn map_to_api_format(timeframe: &str) -> String {
+    match timeframe {
+        "1m" => "minute1".to_string(),
+        "5m" => "minute5".to_string(),
+        "15m" => "minute15".to_string(),
+        "30m" => "minute30".to_string(),
+        "1h" => "hour1".to_string(),
+        "4h" => "hour4".to_string(),
+        "1d" => "daily".to_string(),
+        "1w" => "weekly".to_string(),
+        "1M" => "monthly".to_string(),
+        // Fallback: devolver tal como está si no hay mapeo
+        other => other.to_string(),
     }
 }
