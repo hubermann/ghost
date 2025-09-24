@@ -1,5 +1,5 @@
 use yew::prelude::*;
-use crate::components::{info_card::InfoCard, api_status_card::ApiStatusCard, system_metrics_card::SystemMetricsCard, multi_temporal_analyzer::MultiTemporalAnalyzer};
+use crate::components::{info_card::InfoCard, api_status_card::ApiStatusCard, system_metrics_card::SystemMetricsCard, asset_analysis_card::AssetAnalysisCard};
 
 // Create alias to maintain compatibility
 pub use AssetAnalysisWorking as AssetAnalysis;
@@ -40,22 +40,7 @@ pub fn AssetAnalysisWorking() -> Html {
 
                 <div class="columns is-multiline mt-5">
                     <div class="column is-full">
-                        <div class="card">
-                            <div class="card-content">
-                                <h3 class="title is-5">{ "✅ Sistema Operativo" }</h3>
-                                <p>{ "El componente Asset Analysis está funcionando correctamente" }</p>
-                                <p class="is-size-7 has-text-grey">{ "Routing, WASM y componentes: OK" }</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="column is-full">
-                        <div class="card">
-                            <div class="card-content">
-                                <h3 class="title is-5">{ "🎯 Multi-Temporal Analysis" }</h3>
-                                <p>{ "MultiTemporalAnalyzer temporalmente deshabilitado para debugging" }</p>
-                                <p class="is-size-7 has-text-grey">{ "Componente complejo - verificando si causa hang" }</p>
-                            </div>
-                        </div>
+                        <AssetAnalysisCard />
                     </div>
                 </div>
             </div>

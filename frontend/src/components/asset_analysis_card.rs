@@ -1,40 +1,59 @@
 use yew::prelude::*;
-use web_sys::HtmlInputElement;
+use web_sys::{HtmlInputElement, HtmlSelectElement, Event};
+use wasm_bindgen::JsCast;
 use crate::domain::analysis_types::{AnalysisRequest, AnalysisState, TimeframesState};
-use crate::services::analysis_api::{analyze_asset, fetch_timeframes_config};
-use crate::components::timeframe_selector::TimeframeSelector;
+use crate::services::analysis_api::analyze_asset;
 
 #[function_component]
 pub fn AssetAnalysisCard() -> Html {
     let symbol = use_state(|| String::new());
     let timeframe = use_state(|| String::new());
     let analysis_state = use_state(|| AnalysisState::Idle);
-    let timeframes_state = use_state(|| TimeframesState::Loading);
+    // Usar timeframes estáticos por ahora para que el formulario funcione inmediatamente
+    let timeframes_state = use_state(|| {
+        use crate::domain::analysis_types::TimeframeConfig;
+        let static_timeframes = vec![
+            TimeframeConfig {
+                name: "1d".to_string(),
+                display_name: "Diario".to_string(),
+                duration_seconds: 86400,
+                weight: 1.0,
+                category: "Long Term".to_string(),
+                aliases: vec!["1d".to_string(), "daily".to_string()],
+                recommended_limit: 365,
+                max_gap_hours: 48,
+            },
+            TimeframeConfig {
+                name: "1h".to_string(),
+                display_name: "1 Hora".to_string(),
+                duration_seconds: 3600,
+                weight: 0.5,
+                category: "Medium Term".to_string(),
+                aliases: vec!["1h".to_string(), "hourly".to_string()],
+                recommended_limit: 168,
+                max_gap_hours: 4,
+            },
+            TimeframeConfig {
+                name: "15m".to_string(),
+                display_name: "15 Minutos".to_string(),
+                duration_seconds: 900,
+                weight: 0.3,
+                category: "Short Term".to_string(),
+                aliases: vec!["15m".to_string(), "15min".to_string()],
+                recommended_limit: 192,
+                max_gap_hours: 2,
+            },
+        ];
+        TimeframesState::Loaded(static_timeframes)
+    });
 
-    // Cargar timeframes al montar el componente
+    // Establecer timeframe por defecto
     {
-        let timeframes_state = timeframes_state.clone();
         let timeframe = timeframe.clone();
         use_effect(move || {
-            let timeframes_state = timeframes_state.clone();
-            let timeframe = timeframe.clone();
-            wasm_bindgen_futures::spawn_local(async move {
-                match fetch_timeframes_config().await {
-                    Ok(response) => {
-                        let data = response.timeframes.clone();
-                        timeframes_state.set(TimeframesState::Loaded(data.clone()));
-                        // Establecer el primer timeframe como valor por defecto solo si está vacío
-                        if timeframe.is_empty() {
-                            if let Some(first_timeframe) = data.first() {
-                                timeframe.set(first_timeframe.name.clone());
-                            }
-                        }
-                    }
-                    Err(error) => {
-                        timeframes_state.set(TimeframesState::Error(error));
-                    }
-                }
-            });
+            if timeframe.is_empty() {
+                timeframe.set("1d".to_string());
+            }
             || {}
         });
     }
@@ -153,30 +172,39 @@ pub fn AssetAnalysisCard() -> Html {
                     <div class="control">
                         <label class="label">{ "Temporalidad" }</label>
                         {match (*timeframes_state).clone() {
-                            TimeframesState::Loading => {
+                            TimeframesState::Loaded(timeframes) => {
                                 html! {
-                                    <div class="select is-loading">
-                                        <select disabled={true}>
-                                            <option>{ "Cargando timeframes..." }</option>
+                                    <div class="select">
+                                        <select
+                                            value={(*timeframe).clone()}
+                                            onchange={on_timeframe_change.reform(|e: Event| {
+                                                e.target()
+                                                    .and_then(|t| t.dyn_into::<web_sys::HtmlSelectElement>().ok())
+                                                    .map(|select| select.value())
+                                                    .unwrap_or_default()
+                                            })}
+                                        >
+                                            {for timeframes.iter().map(|tf| {
+                                                html! {
+                                                    <option
+                                                        value={tf.name.clone()}
+                                                        selected={tf.name == *timeframe}
+                                                    >
+                                                        { &tf.display_name }
+                                                    </option>
+                                                }
+                                            })}
                                         </select>
                                     </div>
                                 }
                             }
-                            TimeframesState::Error(error) => {
+                            _ => {
                                 html! {
                                     <div class="select">
                                         <select disabled={true}>
-                                            <option>{ format!("Error: {}", error) }</option>
+                                            <option>{ "Timeframes no disponibles" }</option>
                                         </select>
                                     </div>
-                                }
-                            }
-                            TimeframesState::Loaded(_) => {
-                                html! {
-                                    <TimeframeSelector 
-                                        value={(*timeframe).clone()}
-                                        on_change={on_timeframe_change}
-                                    />
                                 }
                             }
                         }}
