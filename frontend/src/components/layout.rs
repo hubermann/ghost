@@ -2,7 +2,7 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 use gloo_storage::{LocalStorage, Storage};
 use web_sys::window;
-use crate::routes::{Route, Home, ApiStatus, AssetAnalysis, SimpleApiStatus};
+use crate::routes::{Route, Home, AssetAnalysis, SimpleApiStatus};
 
 const THEME_KEY: &str = "ghost-theme";
 
@@ -102,13 +102,8 @@ pub fn Layout() -> Html {
                                 </Link<Route>>
                             </li>
                             <li>
-                                <Link<Route> to={Route::ApiStatus} classes={if current_route == Route::ApiStatus { "is-active" } else { "" }}>
-                                    <span>{ "API Status (Legacy)" }</span>
-                                </Link<Route>>
-                            </li>
-                            <li>
                                 <Link<Route> to={Route::ApiStatusDirect} classes={if current_route == Route::ApiStatusDirect { "is-active" } else { "" }}>
-                                    <span>{ "API Status (Direct)" }</span>
+                                    <span>{ "API Status" }</span>
                                 </Link<Route>>
                             </li>
                             <li>
@@ -134,7 +129,6 @@ pub fn Layout() -> Html {
 fn switch(routes: Route) -> Html {
     match routes {
         Route::Home => html! { <Home /> },
-        Route::ApiStatus => html! { <ApiStatus /> },
         Route::ApiStatusDirect => html! { <SimpleApiStatus /> },
         Route::AssetAnalysis => html! { <AssetAnalysis /> },
         Route::NotFound => html! {

@@ -4,8 +4,6 @@ use yew_router::prelude::*;
 pub enum Route {
     #[at("/")]
     Home,
-    #[at("/api-status")]
-    ApiStatus,
     #[at("/api-status-direct")]
     ApiStatusDirect,
     #[at("/asset-analysis")]
